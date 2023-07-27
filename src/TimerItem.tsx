@@ -2,8 +2,9 @@ import {AppNavigator} from "../App";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { commonStyles, textStyles } from './commonStyles';
+import { TimerState } from "../reducers/timer";
 
-const TimerItemImpl = (props: {id: string}) => {
+const TimerItemImpl = (props: {id: string, timer: TimerState}) => {
     const [actionButtonText, setActionButtonText] = useState("Start");
     
     // TODO: get your timer, type, content, date, and time from React Genie 
@@ -25,12 +26,12 @@ const TimerItemImpl = (props: {id: string}) => {
 
             <Pressable onPress={() => {AppNavigator.push('TimerModal', {id: props.id})}}>
                 <View style={commonStyles.inline}>
-                    <Text style={textStyles.heading2}>{'TODO: type'}</Text>
-                    <Text style={textStyles.heading3}>{'TODO: hour'}:{'TODO: minute'}:{'TODO: second'} </Text>
+                    <Text style={textStyles.heading2}>{props.timer.type}</Text>
+                    <Text style={textStyles.heading3}>{props.timer.delta.toString()} </Text>
                 </View>
                 <View style={commonStyles.inline}>
-                    <Text style={textStyles.text}>{'TODO: content'} </Text>
-                    <Text style={textStyles.text}>{'TODO: date'} </Text>
+                    <Text style={textStyles.text}>{props.timer.content} </Text>
+                    <Text style={textStyles.text}>{new Date(props.timer.createdTime).toDateString()} </Text>
                 </View>
             </Pressable>
 

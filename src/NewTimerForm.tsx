@@ -1,10 +1,13 @@
 import { AppNavigator } from '../App';
 import React, { useState } from 'react';
 import { textStyles, commonStyles } from './commonStyles';
+import { useAppDispatch } from '../hooks';
+import { add } from '../reducers/timer';
+import { TimeDelta } from '../helpers/TimeDelta';
 
 
 const NewTimerFormImpl = () => {
-    // TODO: Initialize your timer with React Genie
+    const dispatch = useAppDispatch();
     const [hour, setHour] = useState('00');
     const [min, setMin] = useState('20');
     const [sec, setSec] = useState('03');
@@ -31,10 +34,27 @@ const NewTimerFormImpl = () => {
                 </div>
 
                 <button style={commonStyles.button} onClick={() => AppNavigator.pop()}>Back</button>
-                <button style={commonStyles.button} onClick={() => {}
-                    // TODO
-                    // Add your onClick callback here using React Genie to add a new timer using the form data
-                    // Make sure to add ` AppNavigator.pop();` at the end to return to previous screen
+                <button style={commonStyles.button} onClick={() => {
+                    const delta = new TimeDelta({
+                        hour: parseInt(hour),
+                        minute: parseInt(min),
+                        second: parseInt(sec)})
+                    
+                    dispatch(
+                        add({
+                            id: "TBD Unique ID",
+                            content,
+                            type,
+                            delta,
+                            finished: false,
+                            pause: false,
+                            createdTime: Date.now(),
+                        })
+                    )
+
+                    AppNavigator.pop();
+
+                    }
                 }>Add Timer</button>
 
             </div>
