@@ -1,11 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
-// ...
+import timerReducer from './reducers/timer'
 
 const store = configureStore({
   reducer: {
-    // posts: postsReducer,
-    // comments: commentsReducer,
-    // users: usersReducer,
+    timer: timerReducer,
   },
 })
 
