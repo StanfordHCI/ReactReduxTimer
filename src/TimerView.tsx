@@ -20,10 +20,7 @@ export const TimerView = () => {
         <View style={commonStyles.appContainer}>
             <View>
             <div style={commonStyles.timerViewContainer}>
-                <button style={commonStyles.button} onClick={() => {}
-                    // TODO: Add your React Genie call back here to get the timer and 
-                    // push it to the next screen using `AppNavigator.push('TimerModal', {id: timer.id})`
-                }>Add New Timer</button>
+                <button style={commonStyles.button} onClick={() => AppNavigator.push('TimerModal')}>Add New Timer</button>
             </div>
             {
                 

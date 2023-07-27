@@ -1,13 +1,14 @@
 import React, { default as ReactFromImport } from "react";
 import { default as ReactReduxFromImport, Provider } from "react-redux";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { NativeStackNavigationProp, NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackNavigationOptions } from "@react-navigation/stack/lib/typescript/src/types";
 import { CardStyleInterpolators, createStackNavigator, HeaderStyleInterpolators } from '@react-navigation/stack';
 
 import { TimerView } from "./src/TimerView";
 import { NewTimerForm } from "./src/NewTimerForm";
 import { createStore } from "redux";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, RouteProp } from "@react-navigation/native";
+import { store } from "./store";
 
 
 export let AppNavigator: any = null;
@@ -21,7 +22,13 @@ const TimerTab = ({route, navigation}: Props) => {
     )
 }
 
-const TimerModalTab = ({route, navigation}: Props) => {
+type RouteParams = RouteProp<any, any> & { id: string };
+type TimerModalTabProps = {
+    route: RouteParams,
+    navigation:  Props,
+}
+
+const TimerModalTab = ({route, navigation}: TimerModalTabProps) => {
     AppNavigator = navigation
     return (
           <NewTimerForm {...route.params}/>
@@ -44,8 +51,6 @@ const modalStyle: StackNavigationOptions = {
     animationTypeForReplace: 'pop',
 }
 
-// const store = createStore({})
-
 const App = () => {
     let TimerStack = () => {
         let TimerNavigator = createStackNavigator();
@@ -67,9 +72,9 @@ const App = () => {
   return (
     // TODO: wrap TimerStack with relevant providers for React Genie
     // <div>HELLO</div>?
-    // <Provider store={}>
+    <Provider store={store}>
           <TimerStack/>
-        // </Provider>
+    </Provider>
   );
 };
 

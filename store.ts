@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import timerReducer from './reducers/timer'
 
-const store = configureStore({
+export const store = configureStore({
   reducer: {
     timer: timerReducer,
   },
