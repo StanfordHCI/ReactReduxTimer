@@ -4,10 +4,10 @@ import {View} from "react-native";
 import { commonStyles } from "./commonStyles";
 import { TimerItem } from "./TimerItem";
 import { useAppSelector } from "../hooks";
-import { getSortedTimers } from "../reducers/timer";
+import { getTimers } from "../reducers/timer";
 
 export const TimerView = () => {
-    const timers = useAppSelector(getSortedTimers);
+    const timers = useAppSelector(getTimers);
 
     return (
         <View style={commonStyles.appContainer}>

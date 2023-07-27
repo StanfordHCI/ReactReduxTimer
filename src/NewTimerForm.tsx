@@ -1,18 +1,20 @@
 import { AppNavigator } from '../App';
 import React, { useState } from 'react';
 import { textStyles, commonStyles } from './commonStyles';
-import { useAppDispatch } from '../hooks';
-import { add } from '../reducers/timer';
+import { useAppDispatch, useAppSelector } from '../hooks';
+import { add, getTimers, update } from '../reducers/timer';
 import { TimeDelta } from '../helpers/TimeDelta';
 
 
-const NewTimerFormImpl = () => {
+const NewTimerFormImpl = (props: {id?: string}) => {
     const dispatch = useAppDispatch();
-    const [hour, setHour] = useState('00');
-    const [min, setMin] = useState('20');
-    const [sec, setSec] = useState('03');
-    const [type, setType] = useState('Default');
-    const [content, setContent] = useState('Default');
+    const timers = useAppSelector(getTimers)
+    const timer = props.id ? timers.find((timer) => timer.id === props.id) : null;
+    const [hour, setHour] = useState(timer ? timer.delta.hour.toString() : '00');
+    const [min, setMin] = useState(timer ? timer.delta.minute.toString() : '20');
+    const [sec, setSec] = useState(timer ? timer.delta.second.toString() : '03');
+    const [type, setType] = useState(timer ? timer.type : 'Default');
+    const [content, setContent] = useState(timer ? timer.content : 'Default');
 
     return (
         <div style={commonStyles.appContainer}>
@@ -39,23 +41,36 @@ const NewTimerFormImpl = () => {
                         hour: parseInt(hour),
                         minute: parseInt(min),
                         second: parseInt(sec)})
-                    
-                    dispatch(
-                        add({
-                            id: "TBD Unique ID",
-                            content,
-                            type,
-                            delta,
-                            finished: false,
-                            pause: false,
-                            createdTime: Date.now(),
-                        })
-                    )
+                    if (props.id && timer) {
+                        dispatch(
+                            update({
+                                id: props.id,
+                                content,
+                                type,
+                                delta,
+                                finished: false,
+                                pause: false,
+                                createdTime: Date.now(),
+                            })
+                        )
+                    } else {
+                        dispatch(
+                            add({
+                                id: `${timers.length + 1}`,
+                                content,
+                                type,
+                                delta,
+                                finished: false,
+                                pause: false,
+                                createdTime: Date.now(),
+                            })
+                        )
+                    }
 
                     AppNavigator.pop();
 
                     }
-                }>Add Timer</button>
+                }>{timer ? 'Update Timer' : 'Add Timer'}</button>
 
             </div>
         </div>

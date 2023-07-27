@@ -40,9 +40,11 @@ export const { add, update, remove } = timerSlice.actions
 
 // Other code such as selectors can use the imported `RootState` type
 export const getSortedTimers = (state: RootState) => state.timer.sort((a: TimerState, b: TimerState) => {
-        return a.createdTime.getMilliseconds() - b.createdTime.getMilliseconds();
+        return new Date(a.createdTime).getMilliseconds() - new Date(b.createdTime).getMilliseconds();
     }).filter((element: TimerState) => {
         return element.finished === false;
     }).reverse();
+
+    export const getTimers = (state: RootState) => state.timer;
 
 export default timerSlice.reducer
