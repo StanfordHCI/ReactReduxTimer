@@ -21,7 +21,6 @@ export const timerSlice = createSlice({
   initialState,
   reducers: {
     add: (state, x:PayloadAction<TimerState>) => {
-      console.log("HERE")
       state.push(x.payload)
     },
     update: (state, x:PayloadAction<TimerState>) => {
