@@ -18,7 +18,7 @@ export const TimerView = () => {
             {
                 
                 timers.map((timer) => {
-                        return <TimerItem id={timer.id} key={timer.id} timer={timer} />
+                        return <TimerItem id={timer.id} key={timer.id} initialTimer={timer} />
                 })
             }
             </View>

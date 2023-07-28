@@ -2,31 +2,38 @@ import {AppNavigator} from "../App";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { commonStyles, textStyles } from './commonStyles';
-import { TimerState, update } from "../reducers/timer";
-import { useAppDispatch } from "../hooks";
+import { TimerState, getTimers, update } from "../reducers/timer";
+import { useAppDispatch, useAppSelector } from "../hooks";
 
-const TimerItemImpl = (props: {id: string, timer: TimerState}) => {
+const TimerItemImpl = (props: {id: string, initialTimer: TimerState}) => {
     const dispatch = useAppDispatch();
-    const {id, timer} = props;
+    const timers = useAppSelector(getTimers)
+    const timer = props.id ? timers.find((t) => t.id === props.id) : props.initialTimer;
     const [actionButtonText, setActionButtonText] = useState("Start");
-
+    let intervalId: NodeJS.Timer | undefined;
     useEffect(() => {
         // If the timer is 0, we don't need to decrease it further, so return
-        if (timer.delta.getLeftSecond() === 0) {
+        if (timer?.delta.getLeftSecond() === 0) {
             return
         }
 
-        const intervalId = setInterval(() => {   
+        intervalId = setInterval(() => {   
+            if (timer?.pause) return
             countDown()
         }, 1000);
 
         return () => clearInterval(intervalId);
     }, [
-        timer.delta.getLeftSecond()
+        timer?.delta.getLeftSecond()
     ]);
 
+
+    if (!timer) {
+        return
+    }
+
     const countDown: () => void = () => {
-        if (!timer.pause) {
+        if (timer && !timer.pause) {
             let sec = timer.delta.getLeftSecond();
             sec = sec - 1;
             if (sec <= 0) {
@@ -43,7 +50,7 @@ const TimerItemImpl = (props: {id: string, timer: TimerState}) => {
     return (
         <View style={commonStyles.timerItemContainer}>
 
-            <Pressable onPress={() => {AppNavigator.push('TimerModal', {id: id})}}>
+            <Pressable onPress={() => {AppNavigator.push('TimerModal', {id: props.id})}}>
                 <View style={commonStyles.inline}>
                     <Text style={textStyles.heading2}>{timer.type}</Text>
                     <Text style={textStyles.heading3}>{timer.delta.toString()} </Text>
@@ -55,7 +62,7 @@ const TimerItemImpl = (props: {id: string, timer: TimerState}) => {
             </Pressable>
 
             <button style={commonStyles.button} onClick={() => {
-                if (actionButtonText === "Start") {
+                if (timer.pause) {
                     dispatch( update({...timer, pause: false}))
                     setActionButtonText("Pause")
                 } else {
@@ -68,5 +75,4 @@ const TimerItemImpl = (props: {id: string, timer: TimerState}) => {
     );
 };
 
-// TODO: update below code export your new timer form for React Genie
 export const TimerItem = TimerItemImpl;
