@@ -95,6 +95,7 @@ export const commonStyles = StyleSheet.create({
         fontSize: "28px",
         borderRadius: 6,
         marginTop: 20,
+        textAlign: 'center',
         ...font
     },
     inline: {

@@ -1,56 +1,65 @@
-import {AppNavigator} from "../App";
+import { AppNavigator } from "../App";
 import React, { useEffect, useState } from "react";
 import { Pressable, Text, View } from "react-native";
 import { commonStyles, textStyles } from './commonStyles';
 import { TimerState, getTimers, update } from "../reducers/timer";
 import { useAppDispatch, useAppSelector } from "../hooks";
+import { TimeDelta } from "../helpers/TimeDelta";
 
-const TimerItemImpl = (props: {id: string, initialTimer: TimerState}) => {
+const TimerItemImpl = (props: { id: string, initialTimer: TimerState }) => {
     const dispatch = useAppDispatch();
-    const timers = useAppSelector(getTimers)
+    const timers = useAppSelector(getTimers);
     const timer = props.id ? timers.find((t) => t.id === props.id) : props.initialTimer;
-    const [actionButtonText, setActionButtonText] = useState("Start");
-    let intervalId: NodeJS.Timer | undefined;
+    const [actionButtonText, setActionButtonText] = useState(timer?.pause ? "Start" : "Pause");
+
     useEffect(() => {
-        // If the timer is 0, we don't need to decrease it further, so return
-        if (timer?.delta.getLeftSecond() === 0) {
-            return
+        let intervalId: NodeJS.Timer;
+
+        if (timer?.delta.getLeftSecond() === 0 || timer?.pause) {
+            return;
         }
 
-        intervalId = setInterval(() => {   
-            if (timer?.pause) return
-            countDown()
+        intervalId = setInterval(() => {
+            countDown();
         }, 1000);
 
         return () => clearInterval(intervalId);
-    }, [
-        timer?.delta.getLeftSecond()
-    ]);
+    }, [timer?.pause]);
 
+    const countDown = () => {
+        if (!timer || timer.pause) {
+            return;
+        }
+
+        let sec = timer.delta.getLeftSecond();
+        sec = sec - 1;
+        if (sec <= 0) {
+            timer.finished = true;
+            return;
+        }
+
+        timer.delta.hour = Math.floor(sec / 3600);
+        timer.delta.minute = Math.floor(sec / 60 % 60);
+        timer.delta.second = Math.floor(sec % 60);
+        dispatch( update({...timer}))
+    }
+
+    const toggleTimerPause = () => {
+        if (!timer) {
+            return
+        }
+        const newPauseState = !timer.pause;
+        dispatch(update({ ...timer, pause: newPauseState }));
+        setActionButtonText(newPauseState ? "Start" : "Pause");
+    };
 
     if (!timer) {
-        return
+        return null; // You should return something here or render an error message
     }
 
-    const countDown: () => void = () => {
-        if (timer && !timer.pause) {
-            let sec = timer.delta.getLeftSecond();
-            sec = sec - 1;
-            if (sec <= 0) {
-                timer.finished = true;
-                return;
-            }
-            timer.delta.hour = Math.floor(sec / 3600);
-            timer.delta.minute = Math.floor(sec / 60 % 60);
-            timer.delta.second = Math.floor(sec % 60);
-            dispatch( update({...timer}))
-        }
-    }
-   
     return (
         <View style={commonStyles.timerItemContainer}>
-
-            <Pressable onPress={() => {AppNavigator.push('TimerModal', {id: props.id})}}>
+            <Pressable onPress={() => { AppNavigator.push('TimerModal', { id: props.id }) }}>
                 <View style={commonStyles.inline}>
                     <Text style={textStyles.heading2}>{timer.type}</Text>
                     <Text style={textStyles.heading3}>{timer.delta.toString()} </Text>
@@ -61,16 +70,12 @@ const TimerItemImpl = (props: {id: string, initialTimer: TimerState}) => {
                 </View>
             </Pressable>
 
-            <button style={commonStyles.button} onClick={() => {
-                if (timer.pause) {
-                    dispatch( update({...timer, pause: false}))
-                    setActionButtonText("Pause")
-                } else {
-                    dispatch( update({...timer, pause: true}))
-                    setActionButtonText("Start")
-                }
-            }
-            }>{actionButtonText}</button>
+            <Pressable
+                style={commonStyles.button}
+                onPress={toggleTimerPause}
+            >
+                {actionButtonText}
+            </Pressable>
         </View>
     );
 };
